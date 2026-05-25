@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* If you want to use your material symbols package, import it right below: */
+@import "material-symbols";
