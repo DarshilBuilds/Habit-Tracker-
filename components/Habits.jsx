@@ -21,7 +21,7 @@ function Habits() {
         </div>
       </div>
       <div className='flex'>
-        <div className='mt-5'>
+        <div className='flex mt-5'>
           <Habitcard />
         </div>
         {/* <div>
