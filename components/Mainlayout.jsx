@@ -5,7 +5,7 @@ function MainLayout() {
   return (
     <>
     <Navigation />
-      <main className="p-6  bg-gray-100">
+      <main className="p-6 bg-gray-100 ">
         <Outlet />
       </main>
     </>

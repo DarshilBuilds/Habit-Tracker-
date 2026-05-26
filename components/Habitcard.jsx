@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react' // 1. Added useRef here
 import AddHabitModal from '.././model/AddHabitModal'
 
 function Habitcard() {
   const [habits, setHabits] = useState([]);
   const [open, setOpen] = useState(false);
   const [daysCount, setDaysCount] = useState(0);
-  
-  // FIXED: Keeps tracking calendars separate for separate habit IDs
-  // Structure will be: { [habitId]: { [dayNumber]: true } }
   const [completedays, setcompletedays] = useState({});
+
+  // 2. CREATE SCROLL REFERENCES
+  const headerScrollRef = useRef(null);
+  const rowRefs = useRef([]); // Stores references for all habit rows
 
   const date = new Date();
   const fullyear = date.getFullYear();
@@ -19,10 +20,8 @@ function Habitcard() {
     return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
   };
 
-  // 1. FIXED: Added this missing step to compute and set the days count on load!
   useEffect(() => {
-    const totalDays = getDaysInCurrentMonth();
-    setDaysCount(totalDays);
+    setDaysCount(getDaysInCurrentMonth());
   }, []);
 
   useEffect(() => {
@@ -46,10 +45,8 @@ function Habitcard() {
     setOpen(false);
   };
 
-  // 2. FIXED: Corrected typo name, updated to use localStorage.setItem, and split logs per habit ID
   const toggleDay = (habitId, daynumber) => {
     const currentHabitRecords = completedays[habitId] || {};
-    
     const updatedays = {
       ...completedays,
       [habitId]: {
@@ -57,117 +54,127 @@ function Habitcard() {
         [daynumber]: !currentHabitRecords[daynumber]
       }
     };
-
     setcompletedays(updatedays);
     localStorage.setItem('habit_tracker_days', JSON.stringify(updatedays));
   };
 
+  // 3. MASTER SYNCHRONIZATION FUNCTION
+  const handleScroll = (scrolledElement) => {
+    const scrollLeftPosition = scrolledElement.scrollLeft;
+
+    // Sync the top header if it wasn't the source of the scroll event
+    if (headerScrollRef.current && headerScrollRef.current !== scrolledElement) {
+      headerScrollRef.current.scrollLeft = scrollLeftPosition;
+    }
+
+    // Sync every single habit grid row on the screen instantly
+    rowRefs.current.forEach((row) => {
+      if (row && row !== scrolledElement) {
+        row.scrollLeft = scrollLeftPosition;
+      }
+    });
+  };
+
   return (
-    <>
-      <div className="flex items-center justify-center p-6 min-h-screen bg-gray-50">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 w-full max-w-4xl">
+    <div className=" min-h-screenflex items-center justify-center ">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-5xl overflow-hidden p-6">
+  
+        {/* Top Navigation Panel Header */}
+        <div className="flex  items-center justify-between p-4 border-b border-gray-100">
+          <div className="flex items-center gap-4">
+            <button className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center font-bold text-gray-600 hover:bg-gray-50 transition active:scale-95 cursor-pointer">‹</button>
+            <span className="text-base font-bold text-gray-800 tracking-tight flex gap-1">
+              {month} {fullyear}
+            </span>
+            <button className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center font-bold text-gray-600 hover:bg-gray-50 transition active:scale-95 cursor-pointer">›</button>
+          </div>
+          <button onClick={() => setOpen(true)} className="bg-indigo-600 text-white text-xs font-bold px-6 py-2 rounded-lg hover:bg-indigo-700 transition active:scale-95 cursor-pointer">
+            + Add Habit
+          </button>
+        </div>
 
-          {/* <!-- Header --> */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-5">
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 bg-gray-50 border border-gray-200 font-bold text-base select-none transition-colors duration-150 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 active:scale-95 cursor-pointer">
-                ‹
-              </button>
-              <span className="flex text-lg font-semibold text-gray-800 tracking-tight gap-2">
-                <div>{month}</div>
-                <div>{fullyear}</div>
-              </span>
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 bg-gray-50 border border-gray-200 font-bold text-base select-none transition-colors duration-150 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 active:scale-95 cursor-pointer">
-                ›
-              </button>
+        {/* Master Table Grid Area */}
+        <div className="flex flex-col">
+          
+          {/* 4. ATTACH REF TO DAYS HEADER & HIDE SCROLLBAR */}
+          <div className="flex items-center border-b border-gray-200 bg-gray-50/50 text-xs font-bold text-gray-400">
+            <div className="w-64 p-4 shrink-0 text-left border-r border-gray-200 pl-6">
+              Habit
             </div>
-
-            <button className="flex items-center gap-2 bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all duration-200 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-200 active:translate-y-0 active:shadow-none active:scale-95 ml-5 cursor-pointer" onClick={() => setOpen(true)}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-              Add Habit
-            </button>
+            
+            {/* Added ref, onScroll listener, and 'scrollbar-none' to hide the bar */}
+            <div 
+              ref={headerScrollRef}
+              onScroll={(e) => handleScroll(e.currentTarget)}
+              className="flex-1 flex overflow-x-auto scrollbar-none divide-x divide-gray-100 select-none"
+            >
+              {Array.from({ length: daysCount }, (_, i) => (
+                <div key={i + 1} className="min-w-[48px] p-3 text-center">
+                  {i + 1}
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* <!-- Habits or Empty State --> */}
+          {/* DYNAMIC ROW RENDER LAYOUT */}
           {habits.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-14 gap-3">
-              <div className="text-gray-300 animate-pulse">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-14 h-14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.4">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-              </div>
-              <div className="text-center">
-                <p className="text-gray-700 font-semibold text-base">No habits yet</p>
-                <p className="text-gray-400 text-sm mt-1">Get started by adding your first habit to track.</p>
-              </div>
-              <button className="flex items-center gap-2 bg-indigo-500 text-white text-sm font-semibold px-6 py-3 rounded-xl mt-2 transition-all duration-200 hover:bg-indigo-600 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-200 active:translate-y-0 active:shadow-none active:scale-95 cursor-pointer" onClick={() => setOpen(true)}>
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-                Add your first habit
-              </button>
+            <div className="text-center py-12 text-sm text-gray-400 font-medium">
+              No habits created yet. Click "+ Add Habit" to start tracking!
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6">
-              {habits.map((habit) => (
-                <div key={habit.id} className="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:border-indigo-200 transition-all">
+            <div className="divide-y divide-gray-200">
+              {habits.map((habit, index) => (
+                <div key={habit.id} className="flex items-center hover:bg-gray-50/30 transition-colors">
                   
-                  {/* FIXED: Restructured layout to stack the calendar neatly under the info header instead of being squished */}
-                  <div className="flex flex-col gap-4">
-                    
-                    {/* Habit Basic Details row */}
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{habit.icon || "🎯"}</span>
-                      <div>
-                        <h3 className="font-bold text-gray-900">{habit.name}</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">{habit.goal}</p>
-                      </div>
-                    </div>
+                  <div className="w-64 p-4 shrink-0 flex items-center gap-3 border-r border-gray-200 pl-6">
+                    <span className="text-xl shrink-0">{habit.icon || "📝"}</span>
+                    <span className="text-sm font-semibold text-gray-700 truncate">
+                      {habit.name}
+                    </span>
+                  </div>
 
-                    {/* Interactive Days Calendar Grid Section */}
-                    <div className="grid grid-cols-7 sm:grid-cols-10 md:grid-cols-14 gap-2 mt-2">
-                      {Array.from({ length: daysCount }, (_, i) => {
-                        const day = i + 1;
-                        
-                        // FIXED: Reads individual item completion statuses securely
-                        const isDone = completedays[habit.id] && completedays[habit.id][day];
+                  {/* 5. ATTACH REFS TO EACH HABIT ROW TRACKER */}
+                  <div 
+                    ref={(el) => (rowRefs.current[index] = el)}
+                    onScroll={(e) => handleScroll(e.currentTarget)}
+                    className="flex-1 flex overflow-x-auto scrollbar-thin divide-x divide-gray-100"
+                  >
+                    {Array.from({ length: daysCount }, (_, i) => {
+                      const day = i + 1;
+                      const isDone = completedays[habit.id] && completedays[habit.id][day];
 
-                        return (
+                      return (
+                        <div key={day} className="min-w-[48px] p-3 flex items-center justify-center">
                           <button
-                            key={day}
-                            onClick={() => toggleDay(habit.id, day)} // FIXED: correctly passing parameters to new function
-                            className={`p-2 rounded-lg text-center font-bold text-xs transition-all duration-150 active:scale-95 cursor-pointer border flex flex-col items-center justify-center min-w-[42px]
-                              ${isDone
-                                ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm'
-                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
+                            onClick={() => toggleDay(habit.id, day)}
+                            className={`w-6 h-6 rounded border transition-all transform active:scale-90 cursor-pointer flex items-center justify-center
+                              ${isDone 
+                                ? 'bg-emerald-500 border-emerald-600 shadow-sm text-white' 
+                                : 'bg-white border-gray-300 hover:border-indigo-400'
                               }`}
                           >
-                            <div className="text-[9px] uppercase tracking-wide opacity-50 font-normal">Day</div>
-                            <div className="text-sm mt-0.5">{day}</div>
+                            {isDone && (
+                              <svg xmlns="http://w3.org" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
                           </button>
-                        );
-                      })}
-                    </div>
-
+                        </div>
+                      );
+                    })}
                   </div>
+
                 </div>
               ))}
             </div>
           )}
 
-          <AddHabitModal
-            isOpen1={open}
-            onClose={() => setOpen(false)}
-            onCreateHabit={onCreateHabit}
-          />
         </div>
+
       </div>
-    </>
+
+      <AddHabitModal isOpen={open} onClose={() => setOpen(false)} onCreateHabit={onCreateHabit} />
+    </div>
   )
 }
 
