@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react' // 1. Added useRef here
 import AddHabitModal from '.././model/AddHabitModal'
 
-function Habitcard() {
+function Habitcard(){
   const [habits, setHabits] = useState([]);
   const [open, setOpen] = useState(false);
   const [daysCount, setDaysCount] = useState(0);
@@ -38,6 +38,15 @@ function Habitcard() {
     }
   }, []);
 
+  const handleDeleteClick = (habitId) => {
+    if (window.confirm("Are you sure you want to delete this habit?")) {
+      const updatedHabits = habits.filter((habit) => habit.id !== habitId);
+      setHabits(updatedHabits);
+      localStorage.setItem("habits", JSON.stringify(updatedHabits));
+      window.location.reload(); 
+    }
+  };
+
   const onCreateHabit = (newHabit) => {
     const updatedHabits = [...habits, newHabit];
     setHabits(updatedHabits);
@@ -58,6 +67,7 @@ function Habitcard() {
     setcompletedays(updatedays);
     localStorage.setItem('habit_tracker_days', JSON.stringify(updatedays));
   };
+   
 
   // 3. MASTER SYNCHRONIZATION FUNCTION
   const handleScroll = (scrolledElement) => {
@@ -75,6 +85,7 @@ function Habitcard() {
       }
     });
   };
+  
 
   return (
     <div className=" min-h-screenflex items-center justify-center ">
@@ -126,13 +137,26 @@ function Habitcard() {
             <div className="divide-y divide-gray-200">
               {habits.map((habit, index) => (
                 <div key={habit.id} className="flex items-center hover:bg-gray-50/30 transition-colors">
+                  {/* 1. Added "group" and changed to "justify-between" to spread items out */}
+                  <div className="w-64 p-4 shrink-0 flex items-center justify-between gap-3 border-r border-gray-200 pl-6 group">
 
-                  <div className="w-64 p-4 shrink-0 flex items-center gap-3 border-r border-gray-200 pl-6">
-                    <span className="text-xl shrink-0">{habit.icon || "📝"}</span>
-                    <span className="text-sm font-semibold text-gray-700 truncate">
-                      {habit.name}
+                    {/* Left container for Icon + Name */}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-xl shrink-0">{habit.icon || "📝"}</span>
+                      <span className="text-sm font-semibold text-gray-700 truncate">
+                        {habit.name}
+                      </span>
+                    </div>
+
+                    <span
+                      className="material-symbols-outlined cursor-pointer text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shrink-0 ml-auto"
+                      onClick={() => handleDeleteClick(habit.id)}
+                    >
+                      delete
                     </span>
                   </div>
+
+
 
                   {/* 5. ATTACH REFS TO EACH HABIT ROW TRACKER */}
                   <div
