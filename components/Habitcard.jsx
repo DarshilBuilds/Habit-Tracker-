@@ -54,6 +54,7 @@ function Habitcard() {
         [daynumber]: !currentHabitRecords[daynumber]
       }
     };
+    window.location.reload() // Force reload to update the UI immediately after toggling a day
     setcompletedays(updatedays);
     localStorage.setItem('habit_tracker_days', JSON.stringify(updatedays));
   };

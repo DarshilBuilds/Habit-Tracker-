@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 
-
-
 function OverallProgressCard() {
   const [habits, setHabits] = useState([]);
-
+  const [completedays, setcompletedays] = useState({});
 
   useEffect(() => {
     const storedHabits = localStorage.getItem('habits');
@@ -12,6 +10,31 @@ function OverallProgressCard() {
       setHabits(JSON.parse(storedHabits));
     }
   }, []);
+
+  useEffect(() => {
+    const savedata = localStorage.getItem('habit_tracker_days');
+    if (savedata) {
+      setcompletedays(JSON.parse(savedata));
+    }
+  }, []);
+
+  const calculateStreak = (habitId) => {
+    const habitDays = completedays[habitId] || {};
+    const today = new Date();
+    let streak = 0;
+    let checkDay = today.getDate();
+
+    while (checkDay > 0) {
+      if (habitDays[checkDay]) {
+        streak++;
+        checkDay--;
+      } else {
+        break;
+      }
+    }
+
+    return streak;
+  };
 
   if (habits.length === 0) {
     return (
@@ -37,7 +60,7 @@ function OverallProgressCard() {
         </div>
 
         {/* 2. THE STACKING ROW CONTAINER */}
-        <div className="flex flex-col divide-y divide-gray-100">
+        <div className="flex flex-col divide-y divide-gray-100">  
 
           {/* Handle empty list inside the card */}
           {habits.length === 0 ? (
@@ -64,7 +87,7 @@ function OverallProgressCard() {
                 {/* Right Side: Status/Metrics */}
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-                    🔥 {habit.streak || 0}
+                    🔥 {calculateStreak(habit.id || habit.name)} day streak
                   </span>
                 </div>
               </div>
