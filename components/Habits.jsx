@@ -20,17 +20,17 @@ function Habits() {
           </p>
         </div>
       </div>
-      <div className='flex'>
-        <div className='mt-5'>
+      <div className='flex gap-3'>
+        <div className='flex mt-5'>
           <Habitcard />
         </div>
-        {/* <div>
+        <div className=' m-5' >
           <OverallProgressCard />
-        </div> */}
+        </div>
       </div>
 
     </>
   )
 }
 
-export default Habits
+export default Habits;
