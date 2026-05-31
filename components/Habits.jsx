@@ -24,7 +24,7 @@ function Habits() {
         <div className='flex mt-5'>
           <Habitcard />
         </div>
-        <div className='mt-5' >
+        <div className=' m-5' >
           <OverallProgressCard />
         </div>
       </div>
@@ -33,4 +33,4 @@ function Habits() {
   )
 }
 
-export default Habits
+export default Habits;

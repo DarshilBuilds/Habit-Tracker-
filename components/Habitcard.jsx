@@ -77,8 +77,8 @@ function Habitcard() {
 
   return (
     <div className=" min-h-screenflex items-center justify-center ">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-5xl overflow-hidden p-6">
-  
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-4xl overflow-hidden p-6">
+
         {/* Top Navigation Panel Header */}
         <div className="flex  items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center gap-4">
@@ -95,15 +95,15 @@ function Habitcard() {
 
         {/* Master Table Grid Area */}
         <div className="flex flex-col">
-          
+
           {/* 4. ATTACH REF TO DAYS HEADER & HIDE SCROLLBAR */}
           <div className="flex items-center border-b border-gray-200 bg-gray-50/50 text-xs font-bold text-gray-400">
             <div className="w-64 p-4 shrink-0 text-left border-r border-gray-200 pl-6">
               Habit
             </div>
-            
+
             {/* Added ref, onScroll listener, and 'scrollbar-none' to hide the bar */}
-            <div 
+            <div
               ref={headerScrollRef}
               onScroll={(e) => handleScroll(e.currentTarget)}
               className="flex-1 flex overflow-x-auto scrollbar-none divide-x divide-gray-100 select-none"
@@ -125,7 +125,7 @@ function Habitcard() {
             <div className="divide-y divide-gray-200">
               {habits.map((habit, index) => (
                 <div key={habit.id} className="flex items-center hover:bg-gray-50/30 transition-colors">
-                  
+
                   <div className="w-64 p-4 shrink-0 flex items-center gap-3 border-r border-gray-200 pl-6">
                     <span className="text-xl shrink-0">{habit.icon || "📝"}</span>
                     <span className="text-sm font-semibold text-gray-700 truncate">
@@ -134,7 +134,7 @@ function Habitcard() {
                   </div>
 
                   {/* 5. ATTACH REFS TO EACH HABIT ROW TRACKER */}
-                  <div 
+                  <div
                     ref={(el) => (rowRefs.current[index] = el)}
                     onScroll={(e) => handleScroll(e.currentTarget)}
                     className="flex-1 flex overflow-x-auto scrollbar-thin divide-x divide-gray-100"
@@ -148,8 +148,8 @@ function Habitcard() {
                           <button
                             onClick={() => toggleDay(habit.id, day)}
                             className={`w-6 h-6 rounded border transition-all transform active:scale-90 cursor-pointer flex items-center justify-center
-                              ${isDone 
-                                ? 'bg-emerald-500 border-emerald-600 shadow-sm text-white' 
+                              ${isDone
+                                ? 'bg-emerald-500 border-emerald-600 shadow-sm text-white'
                                 : 'bg-white border-gray-300 hover:border-indigo-400'
                               }`}
                           >
@@ -178,4 +178,4 @@ function Habitcard() {
   )
 }
 
-export default Habitcard
+export default Habitcard;

@@ -1,45 +1,78 @@
-function OverallProgressCard() {
-  return (
-    <div className="w-full max-w-md bg-white rounded-xl border p-5">
-      
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-6">
-        <span className="material-symbols-outlined text-gray-700">
-          bar_chart
-        </span>
-        <h3 className="font-semibold text-gray-900">
-          Overall Progress
-        </h3>
-      </div>
+import { useEffect, useState } from "react";
 
-      {/* Habit Row */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 text-gray-700">
-          <span className="material-symbols-outlined text-gray-500">
-            description
+
+
+function OverallProgressCard() {
+  const [habits, setHabits] = useState([]);
+
+
+  useEffect(() => {
+    const storedHabits = localStorage.getItem('habits');
+    if (storedHabits) {
+      setHabits(JSON.parse(storedHabits));
+    }
+  }, []);
+
+  if (habits.length === 0) {
+    return (
+      <div>
+        no habit, found
+      </div>
+    );
+  }
+  return (
+    <div className=" w-full bg-white rounded-xl border p-5 border-gray-200 shadow-sm">
+
+      {/* Header */}
+      <div className="w-fit min-w-[320px] max-w-xl p-6 bg-white rounded-2xl shadow-xl border border-gray-100">
+
+        {/* Card Header */}
+        <div className="flex gap-3">
+          <span className="material-symbols-outlined text-gray-700">
+            bar_chart
           </span>
-          <span className="text-sm font-medium">
-            hi
-          </span>
+          <h3 className="font-semibold text-gray-900 mb-5">
+            Overall Progress
+          </h3>
         </div>
 
-        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-          0%
-        </span>
-      </div>
+        {/* 2. THE STACKING ROW CONTAINER */}
+        <div className="flex flex-col divide-y divide-gray-100">
 
-      {/* Progress Bar */}
-      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-indigo-500"
-          style={{ width: "0%" }}
-        />
-      </div>
+          {/* Handle empty list inside the card */}
+          {habits.length === 0 ? (
+            <p className="text-sm text-gray-400 py-4 text-center">
+              No habits listed yet.
+            </p>
+          ) : (
+            /* 3. MAP HABITS INTO VERTICAL ROWS */
+            habits.map((habit) => (
+              <div
+                key={habit.id || habit.name}
+                className="flex items-center justify-between py-3.5 first:pt-0 last:pb-0 gap-8"
+              >
+                {/* Left Side: Habit Details */}
+                <div className="flex flex-col">
+                  <span className="text-base font-semibold text-gray-700 capitalize">
+                    {habit.name}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {habit.category || 'Routine'}
+                  </span>
+                </div>
 
-      {/* Footer */}
-      <p className="mt-2 text-xs text-gray-500">
-        0 of 31 days
-      </p>
+                {/* Right Side: Status/Metrics */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                    🔥 {habit.streak || 0}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
+
+        </div>
+      </div>
 
     </div>
   );
