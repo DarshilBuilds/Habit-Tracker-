@@ -36,13 +36,6 @@ function OverallProgressCard() {
     return streak;
   };
 
-  if (habits.length === 0) {
-    return (
-      <div>
-        no habit, found
-      </div>
-    );
-  }
   return (
     <div className=" w-full bg-white rounded-xl border p-5 border-gray-200 shadow-sm">
 
@@ -58,9 +51,9 @@ function OverallProgressCard() {
             Overall Progress
           </h3>
         </div>
-
+        -
         {/* 2. THE STACKING ROW CONTAINER */}
-        <div className="flex flex-col divide-y divide-gray-100">  
+        <div className="flex flex-col divide-y divide-gray-100">
 
           {/* Handle empty list inside the card */}
           {habits.length === 0 ? (

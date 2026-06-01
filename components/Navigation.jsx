@@ -12,9 +12,6 @@ function Navigation() {
 
               {/* Logo */}
               <div className="flex items-center space-x-2">
-                <div className="w-6 h-6 border-2 border-indigo-600 rounded flex items-center justify-center">
-                  ✓
-                </div>
                 <span className="font-semibold text-lg">
                   HabitTracker
                 </span>
@@ -59,7 +56,7 @@ function Navigation() {
             {/* Right: User */}
             <div className="flex items-center space-x-3">
               <span className="text-sm text-gray-600">
-                Welcome, darshil
+                Welcome
               </span>
             </div>
 
