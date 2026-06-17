@@ -1,6 +1,7 @@
 import React from 'react'
 import OverallProgressCard from './OverallProgressCard'
 import Habitcard from './Habitcard'
+import Dailyprogessgraph from './Dailyprogessgraph';
 
 function Habits() {
   return (
@@ -20,15 +21,21 @@ function Habits() {
           </p>
         </div>
       </div>
-      <div className='flex gap-3'>
-        <div className='flex mt-5'>
-          <Habitcard />
+      <div>
+        <div className='flex gap-3'>
+          <div className='flex mt-5'>
+            <Habitcard />
+          </div>
+          <div className=' m-5' >
+            <OverallProgressCard />
+          </div>
         </div>
-        <div className=' m-5' >
-          <OverallProgressCard />
+        <div>
+          <div className=' mt-5'>
+            <Dailyprogessgraph />
+          </div>
         </div>
       </div>
-
     </>
   )
 }
