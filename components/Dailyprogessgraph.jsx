@@ -152,7 +152,7 @@ function Dailyprogessgraph() {
         y: {
             min: 0,
             // 1. dynamic ceiling: adds padding above your highest completed habit day
-            max: Math.max(maxHabitsCount, Math.max(...habitData) + 1), 
+            max: Math.max(maxHabitsCount, Math.max(...habitData) + 2), 
             ticks: { 
                 // 2. auto-step size: handles clean numbers if values go up to 10+
                 stepSize: Math.max(...habitData) > 5 ? undefined : 1, 
