@@ -34,7 +34,6 @@ The focus is entirely on:
 *   🔔 **Local Reminders:** System-level desktop notifications to keep you on track.
 *   🔄 **Data Portability:** Seamless import and export of user data via JSON files.
 *   🌙 **Customizable Themes:** Integrated Dark Mode and color profile filtering.
-*   🗄️ **Database Migration:** Upgrading local backend store handling to a native SQLite architecture.
 
 ---
 
