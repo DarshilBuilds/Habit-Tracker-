@@ -1,7 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 function Analytics() {
   const [range, setRange] = useState("Last 3 Months");
+  const [totalHabits, setTotalHabits] = useState(0);
+  const [avgCompletion, setAvgCompletion] = useState("0%");
+  const [longestStreak, setLongestStreak] = useState("0 days");
+  const [topHabits, setTopHabits] = useState([]);
+
   const stats = [
     {
       icon: (
@@ -13,7 +18,7 @@ function Analytics() {
       ),
       iconBg: "bg-indigo-100",
       label: "Active Habits",
-      value: "1",
+      value: totalHabits,
       sub: null,
     },
     {
@@ -25,7 +30,7 @@ function Analytics() {
       ),
       iconBg: "bg-green-100",
       label: "Avg. Completion",
-      value: "0%",
+      value: avgCompletion,
       sub: null,
     },
     {
@@ -37,27 +42,157 @@ function Analytics() {
       ),
       iconBg: "bg-amber-100",
       label: "Longest Streak",
-      value: "0 days",
+      value: longestStreak,
       sub: null,
-    },
-    {
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" width="20" height="20">
-          <rect x="3" y="4" width="18" height="17" rx="2" stroke="#A78BFA" strokeWidth="2" />
-          <path d="M3 9h18" stroke="#A78BFA" strokeWidth="2" />
-          <path d="M8 2v3M16 2v3" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-      ),
-      iconBg: "bg-violet-100",
-      label: "Best Month",
-      value: "None",
-      sub: "0%",
     },
   ];
 
-  const topHabits = [
-    { rank: 1, icon: "🧊", name: "drink 8 glass of water", streak: "0 day streak", pct: "0%" },
-  ];
+  useEffect(() => {
+    let activeHabits = [];
+    let activeHabitIds = [];
+    let habitsCount = 0;
+
+    // 1. Get currently active habits list
+    const storedHabits = localStorage.getItem('habits');
+    if (storedHabits) {
+      try {
+        const parsedHabits = JSON.parse(storedHabits);
+        if (Array.isArray(parsedHabits)) {
+          habitsCount = parsedHabits.length;
+          setTotalHabits(habitsCount);
+          activeHabits = parsedHabits;
+          activeHabitIds = parsedHabits.map(h => String(h.id));
+        }
+      } catch (error) {
+        console.error("Error parsing habits from localStorage:", error);
+      }
+    }
+
+    // 2. Get tracker completions logs
+    const savedData = localStorage.getItem('habit_tracker_days');
+    if (savedData && habitsCount > 0) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        let actualCheckedCount = 0;
+        let maxOverallStreak = 0;
+
+        const currentDayOfMonth = new Date().getDate();
+
+        // --- PER-HABIT STATS ENGINE (streak + completion %) ---
+        const habitStats = activeHabits.map((habit) => {
+          const habitId = String(habit.id);
+          const habitDaysObj = parsedData[habitId] || {};
+          let currentStreak = 0;
+          let maxHabitStreak = 0;
+          let checkedCount = 0;
+
+          for (let day = 1; day <= currentDayOfMonth; day++) {
+            const isChecked = habitDaysObj[day];
+            if (isChecked === true || isChecked === "true") {
+              currentStreak += 1;
+              checkedCount += 1;
+              if (currentStreak > maxHabitStreak) {
+                maxHabitStreak = currentStreak;
+              }
+            } else {
+              currentStreak = 0;
+            }
+          }
+
+          if (maxHabitStreak > maxOverallStreak) {
+            maxOverallStreak = maxHabitStreak;
+          }
+
+          const pct = currentDayOfMonth > 0
+            ? Math.min(100, Math.round((checkedCount / currentDayOfMonth) * 100))
+            : 0;
+
+          return {
+            id: habitId,
+            name: habit.name || habit.title || "Unnamed habit",
+            icon: habit.icon || habit.emoji || "✅",
+            streakValue: maxHabitStreak,
+            streak: `${maxHabitStreak} ${maxHabitStreak === 1 ? 'day' : 'days'} streak`,
+            pct: `${pct}%`,
+          };
+        });
+
+        setLongestStreak(`${maxOverallStreak} ${maxOverallStreak === 1 ? 'day' : 'days'}`);
+
+        // Sort by streak descending, assign rank
+        const sorted = [...habitStats]
+          .sort((a, b) => b.streakValue - a.streakValue)
+          .map((h, i) => ({ ...h, rank: i + 1 }));
+
+        setTopHabits(sorted);
+
+        // --- AVG COMPLETION ENGINE ---
+        Object.entries(parsedData).forEach(([habitId, habitDaysObj]) => {
+          if (activeHabitIds.includes(String(habitId)) && habitDaysObj && typeof habitDaysObj === 'object') {
+            Object.values(habitDaysObj).forEach((isChecked) => {
+              if (isChecked === true || isChecked === "true") {
+                actualCheckedCount += 1;
+              }
+            });
+          }
+        });
+
+        const totalPossibleCompletions = habitsCount * currentDayOfMonth;
+        if (totalPossibleCompletions > 0) {
+          const rawPercentage = Math.round((actualCheckedCount / totalPossibleCompletions) * 100);
+          setAvgCompletion(`${rawPercentage > 100 ? 100 : rawPercentage}%`);
+        } else {
+          setAvgCompletion("0%");
+        }
+
+      } catch (error) {
+        console.error("Error parsing tracker completion stats:", error);
+        setAvgCompletion("0%");
+        setLongestStreak("0 days");
+        setTopHabits([]);
+      }
+    } else {
+      setAvgCompletion("0%");
+      setLongestStreak("0 days");
+      setTopHabits(
+        activeHabits.map((habit, i) => ({
+          id: String(habit.id),
+          rank: i + 1,
+          name: habit.name || habit.title || "Unnamed habit",
+          icon: habit.icon || habit.emoji || "✅",
+          streakValue: 0,
+          streak: "0 days streak",
+          pct: "0%",
+        }))
+      );
+    }
+
+  }, []);
+
+  const calculateStreak = (habitId) => {
+    try {
+      const savedData = localStorage.getItem('habit_tracker_days');
+      if (!savedData) return 0;
+      const parsedData = JSON.parse(savedData);
+      const habitDays = parsedData[String(habitId)] || {};
+      const today = new Date();
+      let streak = 0;
+      let checkDay = today.getDate();
+      while (checkDay > 0) {
+        const val = habitDays[checkDay];
+        if (val === true || val === "true") {
+          streak++;
+          checkDay--;
+        } else {
+          break;
+        }
+      }
+      return streak;
+    } catch {
+      return 0;
+    }
+  };
+
   function SparkLine() {
     const months = ["Nov 2024", "Dec 2024", "Jan 2025"];
     const w = 600, h = 200, padL = 36, padB = 36, padR = 24, padT = 16;
@@ -90,9 +225,9 @@ function Analytics() {
       </svg>
     );
   }
-  return (
-    <div className="min-h-screen bg-gray-100  font-sans">
 
+  return (
+    <div className="min-h-screen bg-gray-100 p-6 font-sans">
       {/* Header */}
       <div className="flex items-start justify-between mb-7">
         <div>
@@ -128,7 +263,6 @@ function Analytics() {
 
       {/* Bottom Row */}
       <div className="grid gap-4" style={{ gridTemplateColumns: "1.9fr 1fr" }}>
-
         {/* Monthly Progress Trend */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <p className="text-sm font-semibold text-gray-900">Monthly Progress Trend</p>
@@ -142,26 +276,31 @@ function Analytics() {
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <p className="text-sm font-semibold text-gray-900">Top Performing Habits</p>
           <p className="text-xs text-gray-500 mb-4">This month's best habits</p>
-          {topHabits.map((h) => (
-            <div key={h.name} className="flex items-center gap-3 py-2.5 border-t border-gray-100">
-              <span className="w-5 h-5 rounded-md bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-500 shrink-0">
-                {h.rank}
-              </span>
-              <span className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-lg shrink-0">
-                {h.icon}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-gray-900 truncate">{h.name}</p>
-                <p className="text-xs text-gray-400">{h.streak}</p>
-              </div>
-              <span className="text-xs text-gray-500 font-medium">{h.pct}</span>
-            </div>
-          ))}
-        </div>
 
+          {topHabits.length === 0 ? (
+            <p className="text-xs text-gray-400 pt-2">No habits found.</p>
+          ) : (
+            topHabits.map((h) => (
+              <div key={h.id} className="flex items-center gap-3 py-2.5 border-t border-gray-100">
+                <span className="w-5 h-5 rounded-md bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-500 shrink-0">
+                  {h.rank}
+                </span>
+                <span className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-lg shrink-0">
+                  {h.icon}
+                </span>
+                <div className="flex min-w-0 align-center justify-between gap-2">
+                  <p className="text-xs font-medium text-gray-900 truncate">{h.name}</p>
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md mt-0.5">
+                    🔥 {calculateStreak(h.id)} day streak
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-export default Analytics
+export default Analytics;
