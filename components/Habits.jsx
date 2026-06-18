@@ -22,7 +22,7 @@ function Habits() {
         </div>
       </div>
       <div>
-        <div className='flex gap-3'>
+        <div className='flex gap-3 align-center items-center'>
           <div className='flex mt-5'>
             <Habitcard />
           </div>

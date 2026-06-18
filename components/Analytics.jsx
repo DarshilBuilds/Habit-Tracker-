@@ -91,7 +91,7 @@ function Analytics() {
     );
   }
   return (
-    <div className="min-h-screen bg-gray-100 p-8 font-sans">
+    <div className="min-h-screen bg-gray-100  font-sans">
 
       {/* Header */}
       <div className="flex items-start justify-between mb-7">

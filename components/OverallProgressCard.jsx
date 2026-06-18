@@ -37,10 +37,9 @@ function OverallProgressCard() {
   };
 
   return (
-    <div className=" w-full bg-white rounded-xl border p-5 border-gray-200 shadow-sm">
 
-      {/* Header */}
       <div className="w-fit min-w-[320px] max-w-xl p-6 bg-white rounded-2xl shadow-xl border border-gray-100">
+      {/* Header */}
 
         {/* Card Header */}
         <div className="flex gap-3">
@@ -90,7 +89,6 @@ function OverallProgressCard() {
         </div>
       </div>
 
-    </div>
   );
 }
 
