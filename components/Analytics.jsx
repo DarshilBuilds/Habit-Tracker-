@@ -222,7 +222,7 @@ function Analytics() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 font-sans transition-colors">
+    <div className="min-h-screen dark:bg-gray-900 p-6 font-sans transition-colors">
       {/* Header */}
       <div className="flex items-start justify-between mb-7">
         <div>

@@ -1,7 +1,7 @@
 import React from 'react'
-import OverallProgressCard from './OverallProgressCard'
-import Habitcard from './Habitcard'
-import Dailyprogessgraph from './Dailyprogessgraph';
+import OverallProgressCard from '../model/OverallProgressCard'
+import Habitcard from '../model/Habitcard'
+import Dailyprogessgraph from '../model/Dailyprogessgraph';
 
 function Habits() {
   return (

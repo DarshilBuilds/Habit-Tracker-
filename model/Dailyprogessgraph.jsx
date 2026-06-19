@@ -165,13 +165,13 @@ function Dailyprogessgraph() {
     },
 };  
     return (
-        <div className="p-6 flex flex-col gap-6 border border-gray-200 bg-white shadow-sm rounded-xl w-full max-w-4xl">
+        <div className="p-6 flex flex-col gap-6 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm rounded-xl w-full max-w-4xl transition-colors">
             <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-gray-700">bar_chart</span>
-                    <span className="text-base font-bold text-gray-800">Daily Progress</span>
+                    <span className="material-symbols-outlined text-gray-700 dark:text-gray-300">bar_chart</span>
+                    <span className="text-base font-bold text-gray-800 dark:text-white">Daily Progress</span>
                 </div>
-                <p className="text-xs text-gray-500 pl-8">
+                <p className="text-xs text-gray-500 dark:text-gray-400 pl-8">
                     Track how many habits you complete each day this {month} {fullyear}
                 </p>
             </div>
@@ -182,24 +182,24 @@ function Dailyprogessgraph() {
 
             {/* Bottom Status Grid Display */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="bg-indigo-50 p-4 rounded-xl flex flex-col justify-center">
-                    <span className="text-2xl font-bold text-indigo-700 leading-tight">{totalCompleted}</span>
-                    <span className="text-xs text-indigo-600 mt-1 font-medium">Total Completed</span>
+                <div className="bg-indigo-50 dark:bg-indigo-900/30 p-4 rounded-xl flex flex-col justify-center">
+                    <span className="text-2xl font-bold text-indigo-700 dark:text-indigo-300 leading-tight">{totalCompleted}</span>
+                    <span className="text-xs text-indigo-600 dark:text-indigo-400 mt-1 font-medium">Total Completed</span>
                 </div>
 
-                <div className="bg-emerald-50 p-4 rounded-xl flex flex-col justify-center">
-                    <span className="text-2xl font-bold text-emerald-700 leading-tight">{averageRate}%</span>
-                    <span className="text-xs text-emerald-600 mt-1 font-medium">Average Rate</span>
+                <div className="bg-emerald-50 dark:bg-emerald-900/30 p-4 rounded-xl flex flex-col justify-center">
+                    <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-300 leading-tight">{averageRate}%</span>
+                    <span className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">Average Rate</span>
                 </div>
 
-                <div className="bg-purple-50 p-4 rounded-xl flex flex-col justify-center">
-                    <span className="text-2xl font-bold text-purple-700 leading-tight">{bestDay}</span>
-                    <span className="text-xs text-purple-600 mt-1 font-medium">Best Day</span>
+                <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-xl flex flex-col justify-center">
+                    <span className="text-2xl font-bold text-purple-700 dark:text-purple-300 leading-tight">{bestDay}</span>
+                    <span className="text-xs text-purple-600 dark:text-purple-400 mt-1 font-medium">Best Day</span>
                 </div>
 
-                <div className="bg-orange-50 p-4 rounded-xl flex flex-col justify-center">
-                    <span className="text-2xl font-bold text-orange-700 leading-tight">{activeDays}</span>
-                    <span className="text-xs text-orange-600 mt-1 font-medium">Active Days</span>
+                <div className="bg-orange-50 dark:bg-orange-900/30 p-4 rounded-xl flex flex-col justify-center">
+                    <span className="text-2xl font-bold text-orange-700 dark:text-orange-300 leading-tight">{activeDays}</span>
+                    <span className="text-xs text-orange-600 dark:text-orange-400 mt-1 font-medium">Active Days</span>
                 </div>
             </div>
         </div>

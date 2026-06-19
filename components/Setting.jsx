@@ -15,8 +15,8 @@ function Settings() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-6 py-10 transition-colors">
-        <div className="max-w-2xl mx-auto">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-6 py-10 transition-colors shadow-md rounded-md">
+        <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
             Settings
           </h1>
@@ -58,7 +58,7 @@ function Settings() {
               </div>
               <button
                 onClick={() => setShowConfirm(true)}
-                className="text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-md px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                className="text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-md px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
               >
                 Delete data
               </button>
@@ -85,7 +85,7 @@ function Settings() {
                 </button>
                 <button
                   onClick={handleDeleteData}
-                  className="text-sm font-medium text-white bg-red-600 px-3 py-1.5 rounded-md hover:bg-red-700"
+                  className="text-sm font-medium text-white bg-red-600 px-3 py-1.5 rounded-md hover:bg-red-700 cursor-pointer"
                 >
                   Delete everything
                 </button>
