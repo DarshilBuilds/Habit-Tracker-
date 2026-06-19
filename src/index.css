@@ -2,3 +2,6 @@
 
 /* If you want to use your material symbols package, import it right below: */
 @import "material-symbols";
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
