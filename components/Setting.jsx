@@ -15,7 +15,7 @@ function Settings() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-6 py-10 transition-colors shadow-md rounded-md">
+      <div className="min-h-screen bg-white dark:bg-gray-900 px-6 py-10 transition-colors shadow-lg rounded-md">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
             Settings
