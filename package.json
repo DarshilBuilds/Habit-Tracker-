@@ -3,6 +3,8 @@
   "main": "main.cjs",
   "private": true,
   "version": "1.0.0",
+  "author": "Darshil",
+  "description": "A simple and clean habit tracking desktop application.",
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
