@@ -1,29 +1,30 @@
 const { app, BrowserWindow, screen } = require('electron');
 const path = require('path');
-const isDev = require('electron-is-dev');
+
+// 🛡️ SAFE GUARD: Define fallback values if Forge didn't inject them yet
+const DEV_SERVER_URL = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' 
+  ? MAIN_WINDOW_VITE_DEV_SERVER_URL 
+  : null;
 
 function createWindow() {
-
-  const {width, height} = screen.getPrimaryDisplay().workAreaSize;  
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;  
 
   const mainWindow = new BrowserWindow({ 
     width: width,
     height: height,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false, // Set to true and use preload script for better security
+      contextIsolation: false, 
     },
   });
 
-  // Load Vite local server in development, or compiled index.html in production
-  mainWindow.loadURL(
-    isDev
-      ? 'http://localhost:5173'
-      : `file://${path.join(__dirname, 'dist/index.html')}`
-  );
-
-  if (isDev) {
-    mainWindow.webContents.openDevTools();
+  // 📦 Use our safe fallback variable block
+  if (DEV_SERVER_URL) {
+    mainWindow.loadURL(DEV_SERVER_URL);
+    mainWindow.webContents.openDevTools(); 
+  } else {
+    // Standard relative local path fallback framework
+    mainWindow.loadFile(path.join(__dirname, 'dist/index.html'));
   }
 }
 
