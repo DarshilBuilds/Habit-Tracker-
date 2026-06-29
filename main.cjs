@@ -1,6 +1,11 @@
 const { app, BrowserWindow, screen } = require('electron');
 const path = require('path');
 
+if (require('electron-squirrel-startup')) {
+  app.quit();
+  process.exit(0); 
+}
+
 // 🛡️ SAFE GUARD: Define fallback values if Forge didn't inject them yet
 const DEV_SERVER_URL = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' 
   ? MAIN_WINDOW_VITE_DEV_SERVER_URL 
