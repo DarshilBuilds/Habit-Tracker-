@@ -14,14 +14,16 @@ const DEV_SERVER_URL = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined'
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;  
 
-  const mainWindow = new BrowserWindow({ 
-    width: width,
-    height: height,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false, 
-    },
-  });
+  const mainWindow = new BrowserWindow({
+  width: width,
+  height: height,
+  webPreferences: {
+    webSecurity: true, 
+    nodeIntegration: false,
+    contextIsolation: true
+  }
+});
+
 
   // 📦 Use our safe fallback variable block
   if (DEV_SERVER_URL) {

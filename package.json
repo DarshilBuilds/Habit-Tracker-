@@ -23,6 +23,7 @@
     "electron-is-dev": "^3.0.1",
     "electron-squirrel-startup": "^1.0.1",
     "material-symbols": "^0.44.8",
+    "motion": "^12.42.0",
     "react": "^19.2.6",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.6",
