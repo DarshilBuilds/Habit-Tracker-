@@ -45,7 +45,7 @@ function Navigation() {
 
                     {/* Native Chromium-Accelerated Underline CSS Transition */}
                     <span 
-                      className={`absolute bottom-0 left-0 right-0 h-2px bg-indigo-500 transform transition-all duration-300 ease-out origin-center ${
+                      className={`absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500 transform transition-all duration-300 ease-out origin-center ${
                         isActive 
                           ? "scale-x-100 opacity-100" 
                           : "scale-x-0 opacity-0"
