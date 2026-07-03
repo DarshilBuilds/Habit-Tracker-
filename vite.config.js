@@ -6,4 +6,8 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: './', // Add this line to ensure assets load correctly in Electron
+  publicDir: 'public', // Ensure public folder is included in build
+  build: {
+    copyPublicDir: true, // Ensure public files are copied to dist
+  }
 })

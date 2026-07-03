@@ -6,7 +6,10 @@ module.exports = {
   packagerConfig: {
     asar: true,
     // 🛠️ FIX: Removed the extension as recommended by Electron Forge for general packaging
-    icon: path.resolve(__dirname, './src/assets/habit-icon'), 
+    icon: path.resolve(__dirname, './src/assets/habit-icon'),
+    extraResource: [
+      path.resolve(__dirname, 'public/font'),
+    ],
   },
   rebuildConfig: {},
   makers: [

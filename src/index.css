@@ -1,7 +1,33 @@
 @import "tailwindcss";
-
-/* If you want to use your material symbols package, import it right below: */
 @import "material-symbols";
-@import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('/font/Outfit-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('/font/Outfit-Thin.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('/font/Outfit-Thin.woff') format('woff');
+  font-weight: 100;
+  font-style: normal;
+}
+
+* {
+  font-family: 'Outfit', sans-serif;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+}

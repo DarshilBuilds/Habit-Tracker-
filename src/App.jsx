@@ -6,7 +6,7 @@ import Settings from "../components/Setting";
 import { ThemeProvider } from "../components/ThemeContext";
 
 function App() {
-  return (
+  return (  
     <ThemeProvider>
       <Routes>
         <Route path="/" element={<MainLayout />}>
@@ -14,7 +14,7 @@ function App() {
           <Route path="habits" element={<Habits />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="settings" element={<Settings />} />
-        </Route>
+        </Route>  
       </Routes>
     </ThemeProvider>
   );
