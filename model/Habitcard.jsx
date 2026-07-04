@@ -63,6 +63,7 @@ function Habitcard() {
     const updatedHabits = [...habits, newHabit];
     setHabits(updatedHabits);
     localStorage.setItem("habits", JSON.stringify(updatedHabits));
+    window.location.reload();
     setOpen(false);
   };
 
@@ -95,7 +96,7 @@ function Habitcard() {
 
   return (
     <motion.div
-      className="flex items-center justify-center"
+      className="flex items-center justify-center pl-6"
       variants={fadeUp}
       initial="hidden"
       animate="visible"

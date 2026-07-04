@@ -27,7 +27,7 @@ function Habits() {
       animate="visible"
     >
       {/* Header */}
-      <motion.div variants={fadeUp} transition={{ duration: 0.4, ease: 'easeOut' }}>
+      <motion.div variants={fadeUp} transition={{ duration: 0.4, ease: 'easeOut' }} className='p-6'>
         <h1 className="h-9 font-bold text-[30px] leading-9 tracking-normal text-[#0D1828] dark:text-white rounded-none">
           Habit Tracker
         </h1>
@@ -59,7 +59,7 @@ function Habits() {
 
         {/* Graph */}
         <motion.div
-          className='mt-5'
+          className='mt-5 pl-6 pr-6'
           variants={fadeUp}
           transition={{ duration: 0.4, ease: 'easeOut' }}
         >
