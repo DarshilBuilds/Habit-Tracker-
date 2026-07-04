@@ -7,22 +7,23 @@ if (require('electron-squirrel-startup')) {
 }
 
 // 🛡️ SAFE GUARD: Define fallback values if Forge didn't inject them yet
-const DEV_SERVER_URL = typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined' 
-  ? MAIN_WINDOW_VITE_DEV_SERVER_URL 
-  : null;
+const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || (typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined'
+  ? MAIN_WINDOW_VITE_DEV_SERVER_URL
+  : null);
 
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;  
 
   const mainWindow = new BrowserWindow({
-  width: width,
-  height: height,
-  webPreferences: {
-    webSecurity: true, 
-    nodeIntegration: false,
-    contextIsolation: true
-  }
-});
+    width: width,
+    height: height,
+    webPreferences: {
+      webSecurity: true, 
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.cjs')
+    }
+  });
 
 
   // 📦 Use our safe fallback variable block
