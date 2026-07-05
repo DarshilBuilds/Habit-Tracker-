@@ -316,21 +316,21 @@ function Analytics() {
 
   return (
     <motion.div
-      className="min-h-screen dark:bg-gray-900 p-6 font-sans transition-colors"
+      className="min-h-screen rounded-[28px] border border-[var(--border)] bg-[var(--surface)]/90 p-4 shadow-[0_10px_30px_var(--shadow)] transition-colors sm:p-6 pb-5"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
       {/* Header */}
       <motion.div
-        className="flex items-start justify-between mb-7"
+        className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
       >
         <motion.div variants={fadeUp}>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-[var(--text)]">Analytics</h1>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">
             Track your progress and identify patterns
           </p>
         </motion.div>
@@ -340,7 +340,7 @@ function Analytics() {
           value={range}
           onChange={(e) => setRange(e.target.value)}
           whileHover={{ scale: 1.03 }}
-          className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="cursor-pointer rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm text-[var(--text)] shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         >
           <option>Last 3 Months</option>
           <option>Last 6 Months</option>
@@ -350,7 +350,7 @@ function Analytics() {
 
       {/* Stat Cards */}
       <motion.div
-        className="grid grid-cols-4 gap-4 mb-5"
+        className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 "
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
@@ -360,7 +360,7 @@ function Analytics() {
             key={s.label}
             variants={cardVariant}
             whileHover={{ scale: 1.03, y: -2, transition: { duration: 0.18 } }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm flex items-start gap-4 cursor-default"
+            className="flex cursor-default items-start gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_10px_30px_var(--shadow)]"
           >
             <motion.div
               className={`w-10 h-10 rounded-xl ${s.iconBg} flex items-center justify-center shrink-0`}
@@ -371,8 +371,8 @@ function Analytics() {
               {s.icon}
             </motion.div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{s.label}</p>
-              <p className="text-xl font-bold text-gray-900 dark:text-white leading-tight">
+              <p className="mb-1 text-xs text-[var(--text-muted)]">{s.label}</p>
+              <p className="text-xl font-bold leading-tight text-[var(--text)]">
                 <AnimatedValue value={s.value} />
               </p>
             </div>
@@ -383,101 +383,102 @@ function Analytics() {
       {/* Bottom Row */}
       <motion.div
         className="grid gap-4"
-        style={{ gridTemplateColumns: "1.9fr 1fr" }}
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
       >
-        {/* Monthly Progress Trend */}
-        <motion.div
-          variants={cardVariant}
-          whileHover={{ scale: 1.01, transition: { duration: 0.18 } }}
-          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm"
-        >
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">Monthly Progress Trend</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Completion rates over time</p>
-          <div className="h-48">
-            <SparkLine />
-          </div>
-        </motion.div>
+        <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
+          {/* Monthly Progress Trend */}
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.01, transition: { duration: 0.18 } }}
+            className="rounded-[24px] border border-(--border) bg-(--surface) p-6 shadow-[0_10px_30px_var(--shadow)]"
+          >
+            <p className="text-sm font-semibold text-(--text)">Monthly Progress Trend</p>
+            <p className="mb-4 text-xs text-(--text-muted)">Completion rates over time</p>
+            <div className="h-48">
+              <SparkLine />
+            </div>
+          </motion.div>
 
-        {/* Top Performing Habits */}
-        <motion.div
-          variants={cardVariant}
-          whileHover={{ scale: 1.01, transition: { duration: 0.18 } }}
-          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm"
-        >
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">Top Performing Habits</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">This month's best habits</p>
+          {/* Top Performing Habits */}
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.01, transition: { duration: 0.18 } }}
+            className="rounded-[24px] border border-(--border) bg-(--surface) p-6 shadow-[0_10px_30px_var(--shadow)]"
+          >
+            <p className="text-sm font-semibold text-(--text)">Top Performing Habits</p>
+            <p className="mb-4 text-xs text-(--text-muted)">This month's best habits</p>
 
-          <AnimatePresence mode="popLayout">
-            {topHabits.length === 0 ? (
-              <motion.p
-                key="empty"
-                variants={rowVariant}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="text-xs text-gray-400 dark:text-gray-500 pt-2"
-              >
-                No habits found.
-              </motion.p>
-            ) : (
-              <motion.div
-                variants={staggerContainer}
-                initial="hidden"
-                animate="visible"
-              >
-                {topHabits.map((h) => (
-                  <motion.div
-                    key={h.id}
-                    variants={rowVariant}
-                    exit="exit"
-                    layout
-                    className="flex items-center gap-3 py-2.5 border-t border-gray-100 dark:border-gray-700"
-                  >
-                    {/* Rank badge */}
-                    <motion.span
-                      className="w-5 h-5 rounded-md bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-xs font-bold text-indigo-500 dark:text-indigo-300 shrink-0"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 16, delay: h.rank * 0.06 }}
+            <AnimatePresence mode="popLayout">
+              {topHabits.length === 0 ? (
+                <motion.p
+                  key="empty"
+                  variants={rowVariant}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="pt-2 text-xs text-(--text-muted)"
+                >
+                  No habits found.
+                </motion.p>
+              ) : (
+                <motion.div
+                  variants={staggerContainer}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {topHabits.map((h) => (
+                    <motion.div
+                      key={h.id}
+                      variants={rowVariant}
+                      exit="exit"
+                      layout
+                      className="flex items-center gap-3 border-t border-(--border) py-2.5 first:border-t-0"
                     >
-                      {h.rank}
-                    </motion.span>
-
-                    {/* Emoji */}
-                    <motion.span
-                      className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-lg shrink-0"
-                      initial={{ scale: 0, rotate: -20 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ type: 'spring', stiffness: 350, damping: 18, delay: h.rank * 0.06 + 0.05 }}
-                    >
-                      {h.icon}
-                    </motion.span>
-
-                    <div className="flex min-w-0 align-center justify-between gap-2">
-                      <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">{h.name}</p>
+                      {/* Rank badge */}
                       <motion.span
-                        className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-md mt-0.5"
-                        whileHover={{ scale: 1.07 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-(--accent-soft) text-xs font-bold text-(--accent)"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 16, delay: h.rank * 0.06 }}
                       >
-                        <motion.span
-                          animate={calculateStreak(h.id) > 0 ? { scale: [1, 1.3, 1] } : {}}
-                          transition={{ repeat: Infinity, repeatDelay: 2.5, duration: 0.35 }}
-                        >
-                          🔥
-                        </motion.span>
-                        {calculateStreak(h.id)} day streak
+                        {h.rank}
                       </motion.span>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+
+                      {/* Emoji */}
+                      <motion.span
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-(--surface-muted) text-lg"
+                        initial={{ scale: 0, rotate: -20 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: 'spring', stiffness: 350, damping: 18, delay: h.rank * 0.06 + 0.05 }}
+                      >
+                        {h.icon}
+                      </motion.span>
+
+                      <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                        <p className="truncate text-xs font-medium text-(--text)">{h.name}</p>
+                        <motion.span
+                          className="mt-0.5 inline-flex items-center gap-1 rounded-md bg-(--accent-soft) px-2 py-0.5 text-xs font-medium text-(--accent)"
+                          whileHover={{ scale: 1.07 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                        >
+                          <motion.span
+                            animate={calculateStreak(h.id) > 0 ? { scale: [1, 1.3, 1] } : {}}
+                            transition={{ repeat: Infinity, repeatDelay: 2.5, duration: 0.35 }}
+                          >
+                            🔥
+                          </motion.span>
+                          {calculateStreak(h.id)} day streak
+                        </motion.span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
       </motion.div>
     </motion.div>
   );

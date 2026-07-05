@@ -4,9 +4,11 @@ import Navigation from "./Navigation";
 function MainLayout() {
   return (
     <>
-    <Navigation />
-      <main className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors">
-        <Outlet />
+      <Navigation />
+      <main className="min-h-screen bg-[var(--bg)] px-4 py-6 text-[var(--text)] transition-colors sm:px-6 lg:px-8 lg:py-8">
+        <div className="mx-auto w-full max-w-7xl">
+          <Outlet />
+        </div>
       </main>
     </>
   );

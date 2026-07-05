@@ -44,7 +44,7 @@ function Settings() {
   return (
     <>
       <motion.div
-        className="min-h-screen bg-white dark:bg-gray-900 px-6 py-10 transition-colors shadow-lg rounded-md"
+        className="min-h-screen rounded-[28px] border border-[var(--border)] bg-[var(--surface)] px-4 py-8 shadow-[0_10px_30px_var(--shadow)] transition-colors sm:px-6 sm:py-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
@@ -56,10 +56,13 @@ function Settings() {
         >
           {/* Header */}
           <motion.div variants={fadeUp}>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            <div className="mb-3 inline-flex items-center rounded-full border border-[var(--accent)]/20 bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              Preferences
+            </div>
+            <h1 className="mb-1 text-2xl font-bold text-[var(--text)]">
               Settings
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
+            <p className="mb-8 text-sm text-[var(--text-muted)]">
               Manage your appearance and data preferences.
             </p>
           </motion.div>
@@ -67,7 +70,7 @@ function Settings() {
           {/* Settings Panel */}
           <motion.div
             variants={fadeUp}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg divide-y divide-gray-200 dark:divide-gray-700"
+            className="divide-y divide-[var(--border)] rounded-xl border border-[var(--border)] bg-[var(--surface)]"
           >
             {/* Appearance Row */}
             <motion.div
@@ -75,8 +78,8 @@ function Settings() {
               className="flex items-center justify-between p-5"
             >
               <div>
-                <h2 className="text-sm font-medium text-gray-900 dark:text-white">Appearance</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <h2 className="text-sm font-medium text-[var(--text)]">Appearance</h2>
+                <p className="mt-1 text-sm text-[var(--text-muted)]">
                   Switch between light and dark mode.
                 </p>
               </div>
@@ -88,15 +91,15 @@ function Settings() {
                 aria-checked={darkMode}
                 aria-label="Toggle dark mode"
                 whileTap={{ scale: 0.92 }}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 cursor-pointer ${
-                  darkMode ? "bg-indigo-600" : "bg-gray-200 dark:bg-gray-600"
+                className={`relative inline-flex h-7 w-14 cursor-pointer items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 ${
+                  darkMode ? "bg-[var(--accent)]" : "bg-[var(--surface-strong)]"
                 }`}
               >
                 <motion.span
                   layout
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  className={`inline-block h-4 w-4 rounded-full bg-white ${
-                    darkMode ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-5 w-5 rounded-full bg-white shadow-sm ${
+                    darkMode ? "translate-x-7" : "translate-x-1"
                   }`}
                 />
               </motion.button>
@@ -108,8 +111,8 @@ function Settings() {
               className="flex items-center justify-between p-5"
             >
               <div>
-                <h2 className="text-sm font-medium text-gray-900 dark:text-white">Delete all data</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <h2 className="text-sm font-medium text-[var(--text)]">Delete all data</h2>
+                <p className="mt-1 text-sm text-[var(--text-muted)]">
                   Permanently remove all habits and tracked data stored on this device.
                 </p>
               </div>
@@ -118,7 +121,7 @@ function Settings() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 18 }}
-                className="text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-md px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors cursor-pointer"
+                className="cursor-pointer rounded-md border border-[var(--danger)]/30 px-3 py-1.5 text-sm font-medium text-[var(--danger)] transition-colors hover:bg-[var(--danger-soft)]"
               >
                 Delete data
               </motion.button>
@@ -139,7 +142,7 @@ function Settings() {
             onClick={() => setShowConfirm(false)}
           >
             <motion.div
-              className="bg-white dark:bg-gray-800 rounded-lg max-w-sm w-full p-6"
+              className="w-full max-w-sm rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.25)]"
               variants={modalVariant}
               initial="hidden"
               animate="visible"
@@ -148,7 +151,7 @@ function Settings() {
             >
               {/* Warning icon */}
               <motion.div
-                className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4"
+                className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--danger-soft)]"
                 initial={{ scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 350, damping: 20, delay: 0.1 }}
@@ -160,7 +163,7 @@ function Settings() {
               </motion.div>
 
               <motion.h3
-                className="text-base font-semibold text-gray-900 dark:text-white"
+                className="text-base font-semibold text-[var(--text)]"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.12, duration: 0.25 }}
@@ -169,7 +172,7 @@ function Settings() {
               </motion.h3>
 
               <motion.p
-                className="text-sm text-gray-500 dark:text-gray-400 mt-2"
+                className="mt-2 text-sm text-[var(--text-muted)]"
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.18, duration: 0.25 }}
@@ -188,7 +191,7 @@ function Settings() {
                   onClick={() => setShowConfirm(false)}
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.95 }}
-                  className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                  className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)]"
                 >
                   Cancel
                 </motion.button>
@@ -196,7 +199,7 @@ function Settings() {
                   onClick={handleDeleteData}
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.95 }}
-                  className="text-sm font-medium text-white bg-red-600 px-3 py-1.5 rounded-md hover:bg-red-700 cursor-pointer"
+                  className="cursor-pointer rounded-md bg-[var(--danger)] px-3 py-1.5 text-sm font-medium text-white transition-colors hover:brightness-110"
                 >
                   Delete everything
                 </motion.button>

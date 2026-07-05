@@ -80,7 +80,7 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
         >
           {/* Modal Panel */}
           <motion.div
-            className="w-full max-w-md bg-white rounded-xl p-6 relative"
+            className="relative w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.25)]"
             variants={modalVariant}
             initial="hidden"
             animate="visible"
@@ -93,7 +93,7 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
               whileHover={{ scale: 1.2, rotate: 90 }}
               whileTap={{ scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 cursor-pointer"
+              className="absolute right-4 top-4 cursor-pointer text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
             >
               ✕
             </motion.button>
@@ -104,8 +104,8 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.08, duration: 0.25 }}
             >
-              <h2 className="text-lg font-semibold text-gray-900">Add New Habit</h2>
-              <p className="text-sm text-gray-500 mt-1">Create a new habit to track daily.</p>
+              <h2 className="text-lg font-semibold text-[var(--text)]">Add New Habit</h2>
+              <p className="mt-1 text-sm text-[var(--text-muted)]">Create a new habit to track daily.</p>
             </motion.div>
 
             {/* Fields */}
@@ -117,7 +117,7 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
             >
               {/* Name */}
               <motion.div variants={fieldVariant} transition={{ duration: 0.25 }}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="mb-1 block text-sm font-medium text-[var(--text)]">Name</label>
                 <input
                   type="text"
                   value={name}
@@ -129,7 +129,7 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
 
               {/* Description */}
               <motion.div variants={fieldVariant} transition={{ duration: 0.25 }}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="mb-1 block text-sm font-medium text-[var(--text)]">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -141,14 +141,14 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
 
               {/* Icon Picker */}
               <motion.div variants={fieldVariant} transition={{ duration: 0.25 }} className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+                <label className="mb-1 block text-sm font-medium text-[var(--text)]">Icon</label>
 
                 <motion.button
                   type="button"
                   onClick={() => setIconOpen(!isIconOpen)}
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-between w-24 border rounded-md px-3 py-2 cursor-pointer"
+                  className="flex w-24 cursor-pointer items-center justify-between rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
                 >
                   <motion.span
                     key={selectedIcon}
@@ -175,7 +175,7 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
                       initial="hidden"
                       animate="visible"
                       exit="exit"
-                      className="absolute mt-2 z-10 bg-white border rounded-lg p-3 grid grid-cols-6 gap-3 shadow-lg"
+                      className="absolute z-10 mt-2 grid grid-cols-6 gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 shadow-lg"
                     >
                       {icons.map((icon, i) => (
                         <motion.button
@@ -186,7 +186,7 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
                           transition={{ delay: i * 0.02, type: "spring", stiffness: 400, damping: 18 }}
                           whileHover={{ scale: 1.3 }}
                           whileTap={{ scale: 0.9 }}
-                          className="text-xl hover:bg-gray-100 rounded-md p-1 cursor-pointer"
+                          className="cursor-pointer rounded-md p-1 text-xl transition-colors hover:bg-[var(--surface-muted)]"
                           onClick={() => {
                             setSelectedIcon(icon);
                             setIconOpen(false);
@@ -209,18 +209,18 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
                   className="mt-1"
                 />
                 <div>
-                  <p className="text-sm font-medium text-gray-700">All months (default)</p>
-                  <p className="text-xs text-gray-500">This habit will appear in all months</p>
+                  <p className="text-sm font-medium text-[var(--text)]">All months (default)</p>
+                  <p className="text-xs text-[var(--text-muted)]">This habit will appear in all months</p>
                 </div>
               </motion.div>
 
               {/* Goal */}
               <motion.div variants={fieldVariant} transition={{ duration: 0.25 }}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Goal</label>
+                <label className="mb-1 block text-sm font-medium text-[var(--text)]">Goal</label>
                 <select
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
-                  className="w-full border rounded-md px-3 py-2 text-sm"
+                  className="w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)]"
                 >
                   <option>Once daily</option>
                 </select>
@@ -238,7 +238,7 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
                 onClick={onClose}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.96 }}
-                className="px-4 py-2 text-sm border rounded-md cursor-pointer"
+                className="cursor-pointer rounded-md border border-[var(--border)] px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--surface-muted)]"
               >
                 Cancel
               </motion.button>
@@ -246,7 +246,7 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
                 onClick={handleCreate}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.96 }}
-                className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-md cursor-pointer"
+                className="cursor-pointer rounded-md bg-[var(--accent)] px-4 py-2 text-sm text-white transition hover:bg-[var(--accent-hover)]"
               >
                 Create Habit
               </motion.button>

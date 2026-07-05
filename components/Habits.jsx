@@ -21,51 +21,45 @@ const staggerContainer = {
 
 function Habits() {
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* Header */}
-      <motion.div variants={fadeUp} transition={{ duration: 0.4, ease: 'easeOut' }} className='p-6'>
-        <h1 className="h-9 font-bold text-[30px] leading-9 tracking-normal text-[#0D1828] dark:text-white rounded-none">
-          Habit Tracker
-        </h1>
-        <p className="mt-1 h-5 font-normal text-[14px] leading-5 tracking-normal text-[#475565] dark:text-gray-400 rounded-none">
-          Track your daily habits and build consistency
-        </p>
+    <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+      <motion.div
+        variants={fadeUp}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="rounded-[28px] border border-[var(--border)] bg-[var(--surface)]/90 p-6 shadow-[0_10px_30px_var(--shadow)] sm:p-8"
+      >
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="mb-3 inline-flex items-center rounded-full border border-[var(--accent)]/20 bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent)]">
+              Daily Ritual Hub
+            </div>
+            <h1 className="text-[30px] font-bold leading-tight text-[var(--text)]">
+              Habit Tracker
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
+              Track your daily habits and keep momentum going with a calm, focused experience.
+            </p>
+          </div>
+
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-2 text-sm text-[var(--text-muted)]">
+            <span className="h-2.5 w-2.5 rounded-full bg-[var(--accent)]" />
+            Local-first • private
+          </div>
+        </div>
       </motion.div>
 
-      <div>
-        <div className='flex gap-3 align-center items-center'>
-          {/* Habit Card */}
-          <motion.div
-            className='flex mt-5'
-            variants={fadeUp}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-          >
-            <Habitcard />
-          </motion.div>
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_0.8fr] xl:items-start">
+        <motion.div className="min-w-0" variants={fadeUp} transition={{ duration: 0.4, ease: 'easeOut' }}>
+          <Habitcard />
+        </motion.div>
 
-          {/* Overall Progress Card */}
-          <motion.div
-            className='m-5'
-            variants={fadeUp}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-          >
-            <OverallProgressCard />
-          </motion.div>
-        </div>
-
-        {/* Graph */}
-        <motion.div
-          className='mt-5 pl-6 pr-6'
-          variants={fadeUp}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
-        >
-          <Dailyprogessgraph />
+        <motion.div className="min-w-0" variants={fadeUp} transition={{ duration: 0.4, ease: 'easeOut' }}>
+          <OverallProgressCard />
         </motion.div>
       </div>
+
+      <motion.div className="mt-6" variants={fadeUp} transition={{ duration: 0.4, ease: 'easeOut' }}>
+        <Dailyprogessgraph />
+      </motion.div>
     </motion.div>
   );
 }
