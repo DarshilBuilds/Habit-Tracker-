@@ -198,7 +198,7 @@ function Dailyprogessgraph() {
 
     return (
         <motion.div
-            className="p-6 flex flex-col gap-6 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm rounded-xl w-full max-w-4xl transition-colors"
+            className="p-6 flex flex-col gap-6 border border-gray-200 dark:border-[#171c19] bg-white dark:bg-[#171c19] shadow-sm rounded-xl w-full max-w-4xl transition-colors"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
