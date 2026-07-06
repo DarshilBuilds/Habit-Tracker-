@@ -3,36 +3,33 @@ const path = require('path');
 
 if (require('electron-squirrel-startup')) {
   app.quit();
-  process.exit(0); 
+  process.exit(0);
 }
 
-// 🛡️ SAFE GUARD: Define fallback values if Forge didn't inject them yet
-const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || (typeof MAIN_WINDOW_VITE_DEV_SERVER_URL !== 'undefined'
-  ? MAIN_WINDOW_VITE_DEV_SERVER_URL
-  : null);
+const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173';
+const INDEX_PATH = path.join(__dirname, 'dist', 'index.html');
 
 function createWindow() {
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;  
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
   const mainWindow = new BrowserWindow({
-    width: width,
-    height: height,
+    width,
+    height,
     webPreferences: {
-      webSecurity: true, 
+      webSecurity: true,
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.cjs')
     }
   });
 
-
-  // 📦 Use our safe fallback variable block
-  if (DEV_SERVER_URL) {
-    mainWindow.loadURL(DEV_SERVER_URL);
-    mainWindow.webContents.openDevTools(); 
+  if (!app.isPackaged) {
+    mainWindow.loadURL(DEV_SERVER_URL).catch(() => {
+      mainWindow.loadFile(INDEX_PATH);
+    });
+    mainWindow.webContents.openDevTools();
   } else {
-    // Standard relative local path fallback framework
-    mainWindow.loadFile(path.join(__dirname, 'dist/index.html'));
+    mainWindow.loadFile(INDEX_PATH);
   }
 }
 
