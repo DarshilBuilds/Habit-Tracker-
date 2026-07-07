@@ -155,10 +155,10 @@ function Habitcard() {
             <div
               ref={headerScrollRef}
               onScroll={(e) => handleScroll(e.currentTarget)}
-              className="flex flex-1 select-none overflow-hidden divide-x divide-[var(--border)]"
+              className="flex flex-1 select-none overflow-hidden divide-x divide-(--border)"
             >
               {Array.from({ length: daysCount }, (_, i) => (
-                <div key={i + 1} className="min-w-[48px] p-3 text-center">
+                <div key={i + 1} className="min-w-11 p-3 text-center">
                   {i + 1}
                 </div>
               ))}

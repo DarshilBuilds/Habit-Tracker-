@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from './ThemeContext'
 
@@ -32,6 +32,7 @@ const modalVariant = {
 function Settings() {
   const { darkMode, toggleDarkMode } = useTheme();
   const [showConfirm, setShowConfirm] = useState(false);
+  const fileInputRef = useRef(null);
 
   const handleDeleteData = () => {
     const theme = localStorage.getItem("theme");
@@ -39,6 +40,53 @@ function Settings() {
     if (theme) localStorage.setItem("theme", theme);
     setShowConfirm(false);
     window.location.reload();
+  };
+
+  const handleExportData = () => {
+    const data = {};
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (key) {
+        data[key] = localStorage.getItem(key);
+      }
+    }
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'habit-tracker-data.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportData = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target?.result || '{}');
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          throw new Error('Invalid import data');
+        }
+
+        localStorage.clear();
+        Object.entries(parsed).forEach(([key, value]) => {
+          localStorage.setItem(key, String(value));
+        });
+
+        window.location.reload();
+      } catch (error) {
+        window.alert('Invalid backup file. Please select a valid exported JSON file.');
+      } finally {
+        event.target.value = '';
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (
@@ -72,7 +120,7 @@ function Settings() {
             variants={fadeUp}
             className="divide-y divide-[var(--border)] rounded-xl border border-[var(--border)] bg-[var(--surface)]"
           >
-            {/* Appearance Row */}
+            
             <motion.div
               variants={rowVariant}
               className="flex items-center justify-between p-5"
@@ -103,6 +151,47 @@ function Settings() {
                   }`}
                 />
               </motion.button>
+            </motion.div>
+
+            {/* Backup & Restore Row */}
+            <motion.div
+              variants={rowVariant}
+              className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <h2 className="text-sm font-medium text-[var(--text)]">Backup & restore</h2>
+                <p className="mt-1 text-sm text-[var(--text-muted)]">
+                  Export your saved habits and import a previously exported backup.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <motion.button
+                  type="button"
+                  onClick={handleExportData}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="cursor-pointer rounded-md border border-[var(--accent)]/30 bg-[var(--accent-soft)] px-3 py-1.5 text-sm font-medium text-[var(--accent)] transition-colors hover:bg-[var(--accent)]/10"
+                >
+                  Export data
+                </motion.button>
+                <motion.button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="cursor-pointer rounded-md border border-[var(--border)] px-3 py-1.5 text-sm font-medium text-[var(--text)] transition-colors hover:bg-[var(--surface-muted)]"
+                >
+                  Import data
+                </motion.button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="application/json"
+                  className="hidden"
+                  onChange={handleImportData}
+                />
+              </div>
             </motion.div>
 
             {/* Delete Data Row */}
