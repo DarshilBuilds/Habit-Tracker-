@@ -48,13 +48,12 @@ function AddHabitModal({ isOpen, onClose, onCreateHabit }) {
     if (!name.trim()) return;
 
     const newHabit = {
-      id: Date.now(),
+      id: String(Date.now()),
       name: name.trim(),
       description: description.trim(),
       icon: selectedIcon,
       goal,
-      allMonths,
-      completedDates: []
+      allMonths
     };
 
     onCreateHabit(newHabit);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import AddHabitModal from './AddHabitModal'
+import { loadAllHabitDays, saveHabitDays, getYearMonthKey } from '../src/utils/habitStorage'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -23,39 +24,53 @@ const rowVariant = {
 function Habitcard() {
   const [habits, setHabits] = useState([]);
   const [open, setOpen] = useState(false);
-  const [daysCount, setDaysCount] = useState(0);
-  const [completedays, setcompletedays] = useState({});
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [allDaysData, setAllDaysData] = useState({});
 
   const headerScrollRef = useRef(null);
   const rowRefs = useRef([]);
 
-  const date = new Date();
-  const fullyear = date.getFullYear();
-  const month = new Date().toLocaleDateString("default", { month: "long" });
+  const yearMonthKey = getYearMonthKey(selectedDate);
+  const monthName = selectedDate.toLocaleDateString("default", { month: "long" });
+  const fullYear = selectedDate.getFullYear();
+  const daysCount = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
 
-  const getDaysInCurrentMonth = () => {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  };
-
-  useEffect(() => { setDaysCount(getDaysInCurrentMonth()); }, []);
+  const currentMonthData = allDaysData[yearMonthKey] || {};
 
   useEffect(() => {
     const storedHabits = localStorage.getItem('habits');
     if (storedHabits) setHabits(JSON.parse(storedHabits));
   }, []);
 
+  const refreshDaysData = () => {
+    const loaded = loadAllHabitDays();
+    setAllDaysData(loaded);
+  };
+
   useEffect(() => {
-    const savedata = localStorage.getItem('habit_tracker_days');
-    if (savedata) setcompletedays(JSON.parse(savedata));
+    refreshDaysData();
+    window.addEventListener('habitDataChanged', refreshDaysData);
+    window.addEventListener('storage', refreshDaysData);
+    return () => {
+      window.removeEventListener('habitDataChanged', refreshDaysData);
+      window.removeEventListener('storage', refreshDaysData);
+    };
   }, []);
+
+  const handlePrevMonth = () => {
+    setSelectedDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setSelectedDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
 
   const handleDeleteClick = (habitId) => {
     if (window.confirm("Are you sure you want to delete this habit?")) {
       const updatedHabits = habits.filter((habit) => habit.id !== habitId);
       setHabits(updatedHabits);
       localStorage.setItem("habits", JSON.stringify(updatedHabits));
-      window.location.reload();
+      window.dispatchEvent(new CustomEvent('habitDataChanged'));
     }
   };
 
@@ -63,23 +78,30 @@ function Habitcard() {
     const updatedHabits = [...habits, newHabit];
     setHabits(updatedHabits);
     localStorage.setItem("habits", JSON.stringify(updatedHabits));
-    window.location.reload();
+    window.dispatchEvent(new CustomEvent('habitDataChanged'));
     setOpen(false);
   };
 
   const toggleDay = (habitId, daynumber) => {
-    const currentHabitRecords = completedays[habitId] || {};
-    const updatedays = {
-      ...completedays,
+    const latestAllData = loadAllHabitDays();
+    const monthRecords = latestAllData[yearMonthKey] || {};
+    const currentHabitRecords = monthRecords[habitId] || {};
+
+    const updatedMonthRecords = {
+      ...monthRecords,
       [habitId]: {
         ...currentHabitRecords,
         [daynumber]: !currentHabitRecords[daynumber]
       }
     };
-    setcompletedays(updatedays);
-    localStorage.setItem('habit_tracker_days', JSON.stringify(updatedays));
-    // ⚠️ Removed window.location.reload() — it kills animations.
-    // State update above is enough to re-render the checkmarks.
+
+    const updatedAllData = {
+      ...latestAllData,
+      [yearMonthKey]: updatedMonthRecords
+    };
+
+    setAllDaysData(updatedAllData);
+    saveHabitDays(updatedAllData);
   };
 
   const handleScroll = (scrolledElement) => {
@@ -113,19 +135,23 @@ function Habitcard() {
         >
           <div className="flex items-center gap-4">
             <motion.button
+              onClick={handlePrevMonth}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center justify-center font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer"
+              title="Previous Month"
+              className="w-8 h-8 rounded-lg border border-[var(--border)] flex items-center justify-center font-bold text-[var(--text)] hover:bg-[var(--surface-muted)] transition cursor-pointer"
             >‹</motion.button>
 
             <span className="flex gap-1 text-base font-bold tracking-tight text-[var(--text)]">
-              {month} {fullyear}
+              {monthName} {fullYear}
             </span>
 
             <motion.button
+              onClick={handleNextMonth}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="w-8 h-8 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center justify-center font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer"
+              title="Next Month"
+              className="w-8 h-8 rounded-lg border border-[var(--border)] flex items-center justify-center font-bold text-[var(--text)] hover:bg-[var(--surface-muted)] transition cursor-pointer"
             >›</motion.button>
           </div>
 
@@ -155,7 +181,7 @@ function Habitcard() {
             <div
               ref={headerScrollRef}
               onScroll={(e) => handleScroll(e.currentTarget)}
-              className="flex flex-1 select-none overflow-hidden divide-x divide-(--border)"
+              className="flex flex-1 select-none overflow-hidden divide-x divide-[var(--border)]"
             >
               {Array.from({ length: daysCount }, (_, i) => (
                 <div key={i + 1} className="min-w-11 p-3 text-center">
@@ -195,7 +221,7 @@ function Habitcard() {
                     className="flex items-center transition-colors hover:bg-[var(--surface-muted)]"
                   >
                     {/* Habit Name Column */}
-                    <div className="w-52 p-4 shrink-0 flex items-center justify-between gap-3 border-r border-gray-200 dark:border-gray-700 pl-6 group">
+                    <div className="w-52 p-4 shrink-0 flex items-center justify-between gap-3 border-r border-[var(--border)] pl-6 group">
                       <div className="flex items-center gap-3 min-w-0">
                         <motion.span
                           className="text-xl shrink-0"
@@ -228,7 +254,7 @@ function Habitcard() {
                     >
                       {Array.from({ length: daysCount }, (_, i) => {
                         const day = i + 1;
-                        const isDone = completedays[habit.id]?.[day];
+                        const isDone = currentMonthData[habit.id]?.[day];
 
                         return (
                           <div key={day} className="flex min-w-[38px] items-center justify-center p-2 sm:min-w-[44px] sm:p-3">
@@ -280,4 +306,4 @@ function Habitcard() {
   );
 }
 
-export default Habitcard;
+export default Habitcard;

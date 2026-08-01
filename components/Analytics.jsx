@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
+import { loadAllHabitDays, getYearMonthKey, calculateHabitStreak } from '../src/utils/habitStorage'
 
 // Animated counter hook
 function useCountUp(target, duration = 900) {
@@ -62,30 +63,55 @@ const rowVariant = {
 };
 
 // Animated sparkline with draw-on effect
-function SparkLine() {
+function SparkLine({ allDaysData = {}, habitsCount = 0 }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
   const [pathLength, setPathLength] = useState(0);
   const pathRef = useRef(null);
 
-  const months = ["Nov 2024", "Dec 2024", "Jan 2025"];
+  const now = new Date();
+  const monthDataList = [];
+  for (let i = 2; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = getYearMonthKey(d);
+    const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    const label = d.toLocaleDateString("default", { month: "short", year: "numeric" });
+
+    let checkedCount = 0;
+    const monthObj = allDaysData[key] || {};
+    Object.values(monthObj).forEach((habitDays) => {
+      if (habitDays && typeof habitDays === 'object') {
+        Object.values(habitDays).forEach((v) => {
+          if (v === true || v === "true") checkedCount++;
+        });
+      }
+    });
+
+    const isCurrentMonth = i === 0;
+    const daysToConsider = isCurrentMonth ? Math.max(1, now.getDate()) : daysInMonth;
+    const maxPossible = (habitsCount > 0 ? habitsCount : 1) * daysToConsider;
+    const rate = Math.min(1, checkedCount / maxPossible);
+
+    monthDataList.push({ label, rate });
+  }
+
   const w = 600, h = 200, padL = 36, padB = 36, padR = 24, padT = 16;
   const inner_w = w - padL - padR;
   const inner_h = h - padT - padB;
-  const yZero = padT + inner_h;
 
-  const points = months.map((_, i) => {
-    const x = padL + (i / (months.length - 1)) * inner_w;
-    return { x, y: yZero };
+  const points = monthDataList.map((m, i) => {
+    const x = padL + (i / (monthDataList.length - 1)) * inner_w;
+    const y = padT + inner_h - m.rate * inner_h;
+    return { x, y };
   });
 
-  const pointsStr = points.map(p => `${p.x},${p.y}`).join(' ');
+  const pointsStr = points.map((p) => `${p.x},${p.y}`).join(' ');
 
   useEffect(() => {
     if (pathRef.current) {
       setPathLength(pathRef.current.getTotalLength());
     }
-  }, []);
+  }, [pointsStr]);
 
   return (
     <svg ref={ref} viewBox={`0 0 ${w} ${h}`} width="100%" height="100%" display="block">
@@ -129,11 +155,11 @@ function SparkLine() {
         />
       ))}
 
-      {months.map((m, i) => {
-        const x = padL + (i / (months.length - 1)) * inner_w;
+      {monthDataList.map((m, i) => {
+        const x = padL + (i / (monthDataList.length - 1)) * inner_w;
         return (
           <motion.text
-            key={m}
+            key={m.label}
             x={x}
             y={h - 8}
             textAnchor="middle"
@@ -143,7 +169,7 @@ function SparkLine() {
             animate={inView ? { opacity: 1 } : {}}
             transition={{ delay: 0.3 + i * 0.1 }}
           >
-            {m}
+            {m.label}
           </motion.text>
         );
       })}
@@ -157,6 +183,7 @@ function Analytics() {
   const [avgCompletion, setAvgCompletion] = useState("0%");
   const [longestStreak, setLongestStreak] = useState("0 days");
   const [topHabits, setTopHabits] = useState([]);
+  const [allDaysData, setAllDaysData] = useState({});
 
   const stats = [
     {
@@ -213,33 +240,30 @@ function Analytics() {
       } catch (error) { console.error(error); }
     }
 
-    const savedData = localStorage.getItem('habit_tracker_days');
-    if (savedData && habitsCount > 0) {
+    const parsedData = loadAllHabitDays();
+    setAllDaysData(parsedData);
+
+    if (habitsCount > 0) {
       try {
-        const parsedData = JSON.parse(savedData);
         let actualCheckedCount = 0;
         let maxOverallStreak = 0;
-        const currentDayOfMonth = new Date().getDate();
+        const now = new Date();
+        const currentMonthKey = getYearMonthKey(now);
+        const currentDayOfMonth = now.getDate();
+        const currentMonthRecords = parsedData[currentMonthKey] || {};
 
         const habitStats = activeHabits.map((habit) => {
           const habitId = String(habit.id);
-          const habitDaysObj = parsedData[habitId] || {};
-          let currentStreak = 0;
-          let maxHabitStreak = 0;
-          let checkedCount = 0;
+          const streak = calculateHabitStreak(habitId, parsedData, now);
+          if (streak > maxOverallStreak) maxOverallStreak = streak;
 
+          const habitDaysObj = currentMonthRecords[habitId] || {};
+          let checkedCount = 0;
           for (let day = 1; day <= currentDayOfMonth; day++) {
-            const isChecked = habitDaysObj[day];
-            if (isChecked === true || isChecked === "true") {
-              currentStreak += 1;
+            if (habitDaysObj[day] === true || habitDaysObj[day] === "true") {
               checkedCount += 1;
-              if (currentStreak > maxHabitStreak) maxHabitStreak = currentStreak;
-            } else {
-              currentStreak = 0;
             }
           }
-
-          if (maxHabitStreak > maxOverallStreak) maxOverallStreak = maxHabitStreak;
 
           const pct = currentDayOfMonth > 0
             ? Math.min(100, Math.round((checkedCount / currentDayOfMonth) * 100)) : 0;
@@ -248,8 +272,8 @@ function Analytics() {
             id: habitId,
             name: habit.name || habit.title || "Unnamed habit",
             icon: habit.icon || habit.emoji || "✅",
-            streakValue: maxHabitStreak,
-            streak: `${maxHabitStreak} ${maxHabitStreak === 1 ? 'day' : 'days'} streak`,
+            streakValue: streak,
+            streak: `${streak} ${streak === 1 ? 'day' : 'days'} streak`,
             pct: `${pct}%`,
           };
         });
@@ -261,11 +285,12 @@ function Analytics() {
           .map((h, i) => ({ ...h, rank: i + 1 }));
         setTopHabits(sorted);
 
-        Object.entries(parsedData).forEach(([habitId, habitDaysObj]) => {
+        Object.entries(currentMonthRecords).forEach(([habitId, habitDaysObj]) => {
           if (activeHabitIds.includes(String(habitId)) && habitDaysObj && typeof habitDaysObj === 'object') {
-            Object.values(habitDaysObj).forEach((isChecked) => {
+            for (let day = 1; day <= currentDayOfMonth; day++) {
+              const isChecked = habitDaysObj[day];
               if (isChecked === true || isChecked === "true") actualCheckedCount += 1;
-            });
+            }
           }
         });
 
@@ -298,21 +323,9 @@ function Analytics() {
   }, []);
 
   const calculateStreak = (habitId) => {
-    try {
-      const savedData = localStorage.getItem('habit_tracker_days');
-      if (!savedData) return 0;
-      const parsedData = JSON.parse(savedData);
-      const habitDays = parsedData[String(habitId)] || {};
-      let streak = 0;
-      let checkDay = new Date().getDate();
-      while (checkDay > 0) {
-        const val = habitDays[checkDay];
-        if (val === true || val === "true") { streak++; checkDay--; }
-        else break;
-      }
-      return streak;
-    } catch { return 0; }
+    return calculateHabitStreak(habitId, allDaysData, new Date());
   };
+
 
   return (
     <motion.div
@@ -397,7 +410,7 @@ function Analytics() {
             <p className="text-sm font-semibold text-(--text)">Monthly Progress Trend</p>
             <p className="mb-4 text-xs text-(--text-muted)">Completion rates over time</p>
             <div className="h-48">
-              <SparkLine />
+              <SparkLine allDaysData={allDaysData} habitsCount={totalHabits} />
             </div>
           </motion.div>
 

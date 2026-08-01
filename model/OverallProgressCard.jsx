@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { loadAllHabitDays, calculateHabitStreak } from "../src/utils/habitStorage";
 
 const cardVariant = {
   hidden: { opacity: 0, y: 20 },
@@ -50,31 +51,25 @@ function OverallProgressCard() {
   const [habits, setHabits] = useState([]);
   const [completedays, setcompletedays] = useState({});
 
-  useEffect(() => {
+  const refreshData = () => {
     const storedHabits = localStorage.getItem('habits');
     if (storedHabits) setHabits(JSON.parse(storedHabits));
-  }, []);
+    const allData = loadAllHabitDays();
+    setcompletedays(allData);
+  };
 
   useEffect(() => {
-    const savedata = localStorage.getItem('habit_tracker_days');
-    if (savedata) setcompletedays(JSON.parse(savedata));
+    refreshData();
+    window.addEventListener('habitDataChanged', refreshData);
+    window.addEventListener('storage', refreshData);
+    return () => {
+      window.removeEventListener('habitDataChanged', refreshData);
+      window.removeEventListener('storage', refreshData);
+    };
   }, []);
 
-  const calculateStreak = (habitId) => {
-    const habitDays = completedays[habitId] || {};
-    const today = new Date();
-    let streak = 0;
-    let checkDay = today.getDate();
-
-    while (checkDay > 0) {
-      if (habitDays[checkDay]) {
-        streak++;
-        checkDay--;
-      } else {
-        break;
-      }
-    }
-    return streak;
+  const getStreak = (habitId) => {
+    return calculateHabitStreak(habitId, completedays, new Date());
   };
 
   return (
@@ -128,7 +123,7 @@ function OverallProgressCard() {
             </motion.p>
           ) : (
             habits.map((habit) => {
-              const streak = calculateStreak(habit.id || habit.name);
+              const streak = getStreak(habit.id);
               return (
                 <motion.div
                   key={habit.id || habit.name}
@@ -183,4 +178,4 @@ function OverallProgressCard() {
   );
 }
 
-export default OverallProgressCard;
+export default OverallProgressCard;

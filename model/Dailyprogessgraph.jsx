@@ -10,6 +10,7 @@ import {
     Tooltip,
     Legend
 } from 'chart.js';
+import { loadAllHabitDays, getYearMonthKey } from '../src/utils/habitStorage';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
@@ -86,6 +87,7 @@ function Dailyprogessgraph() {
     const labels = Array.from({ length: totalDaysInMonth }, (_, i) => String(i + 1).padStart(2, '0'));
 
     useEffect(() => {
+        let timer;
         const updateCalculatedMetrics = () => {
             let activeHabitIds = [];
 
@@ -100,55 +102,53 @@ function Dailyprogessgraph() {
                 } catch (e) { console.error("Error parsing habits list:", e); }
             }
 
-            const savedData = localStorage.getItem('habit_tracker_days');
-            if (savedData) {
-                try {
-                    const parsedData = JSON.parse(savedData);
-                    const monthlyCounts = Array(totalDaysInMonth).fill(0);
+            const allData = loadAllHabitDays();
+            const currentMonthKey = getYearMonthKey(now);
+            const monthData = allData[currentMonthKey] || {};
 
-                    Object.entries(parsedData).forEach(([habitId, habitDaysObj]) => {
-                        if (activeHabitIds.includes(String(habitId)) && habitDaysObj && typeof habitDaysObj === 'object') {
-                            Object.entries(habitDaysObj).forEach(([dayStr, isChecked]) => {
-                                const dayNum = parseInt(dayStr, 10);
-                                if ((isChecked === true || isChecked === "true") && dayNum >= 1 && dayNum <= totalDaysInMonth) {
-                                    monthlyCounts[dayNum - 1] += 1;
-                                }
-                            });
+            const monthlyCounts = Array(totalDaysInMonth).fill(0);
+
+            Object.entries(monthData).forEach(([habitId, habitDaysObj]) => {
+                if (activeHabitIds.includes(String(habitId)) && habitDaysObj && typeof habitDaysObj === 'object') {
+                    Object.entries(habitDaysObj).forEach(([dayStr, isChecked]) => {
+                        const dayNum = parseInt(dayStr, 10);
+                        if ((isChecked === true || isChecked === "true") && dayNum >= 1 && dayNum <= totalDaysInMonth) {
+                            monthlyCounts[dayNum - 1] += 1;
                         }
                     });
+                }
+            });
 
-                    setHabitData(monthlyCounts);
+            setHabitData(monthlyCounts);
 
-                    const total = monthlyCounts.reduce((sum, val) => sum + val, 0);
-                    setTotalCompleted(total);
+            const total = monthlyCounts.reduce((sum, val) => sum + val, 0);
+            setTotalCompleted(total);
 
-                    const active = monthlyCounts.filter(val => val > 0).length;
-                    setActiveDays(active);
+            const active = monthlyCounts.filter(val => val > 0).length;
+            setActiveDays(active);
 
-                    const highest = Math.max(...monthlyCounts);
-                    setBestDay(highest > 0 ? highest : 0);
+            const highest = Math.max(...monthlyCounts);
+            setBestDay(highest > 0 ? highest : 0);
 
-                    const currentDayOfMonth = new Date().getDate();
-                    const totalPossibleChecks = activeHabitIds.length * currentDayOfMonth;
-                    const avg = total > 0 && totalPossibleChecks > 0
-                        ? Math.round((total / totalPossibleChecks) * 100)
-                        : 0;
-                    setAverageRate(avg > 100 ? 100 : avg);
-
-                } catch (error) { console.error("Error parsing tracker data:", error); }
-            } else {
-                setHabitData(Array(totalDaysInMonth).fill(0));
-                setTotalCompleted(0); setActiveDays(0); setBestDay(0); setAverageRate(0);
-            }
+            const elapsedDays = Math.min(totalDaysInMonth, Math.max(1, now.getDate()));
+            const completedSoFar = monthlyCounts.slice(0, elapsedDays).reduce((sum, val) => sum + val, 0);
+            const totalPossibleChecks = activeHabitIds.length * elapsedDays;
+            const avg = completedSoFar > 0 && totalPossibleChecks > 0
+                ? Math.round((completedSoFar / totalPossibleChecks) * 100)
+                : 0;
+            setAverageRate(Math.min(100, avg));
 
             // Slight delay so chart animates in after data is ready
-            setTimeout(() => setChartReady(true), 100);
+            timer = setTimeout(() => setChartReady(true), 100);
         };
 
         updateCalculatedMetrics();
+        window.addEventListener('habitDataChanged', updateCalculatedMetrics);
         window.addEventListener('storage', updateCalculatedMetrics);
         window.addEventListener('load', updateCalculatedMetrics);
         return () => {
+            if (timer) clearTimeout(timer);
+            window.removeEventListener('habitDataChanged', updateCalculatedMetrics);
             window.removeEventListener('storage', updateCalculatedMetrics);
             window.removeEventListener('load', updateCalculatedMetrics);
         };
@@ -159,13 +159,13 @@ function Dailyprogessgraph() {
         datasets: [{
             label: 'Habits Completed',
             data: habitData,
-            borderColor: '#6366f1',
-            backgroundColor: '#6366f1',
+            borderColor: '#3D8267',
+            backgroundColor: '#3D8267',
             borderWidth: 2,
-            pointBackgroundColor: '#6366f1',
+            pointBackgroundColor: '#3D8267',
             pointRadius: 4,
             pointHoverRadius: 6,
-            tension: 0,
+            tension: 0.1,
         }],
     };
 
@@ -184,21 +184,21 @@ function Dailyprogessgraph() {
             },
             y: {
                 min: 0,
-                max: Math.max(maxHabitsCount, Math.max(...habitData) + 2),
+                max: Math.max(maxHabitsCount, Math.max(...habitData) + 1),
                 ticks: {
-                    stepSize: Math.max(...habitData) > 5 ? undefined : 1,
+                    stepSize: 1,
                     precision: 0,
                     color: '#9ca3af',
                     font: { size: 10 }
                 },
-                grid: { color: '#f3f4f6' },
+                grid: { color: 'rgba(228, 228, 224, 0.4)' },
             },
         },
     };
 
     return (
         <motion.div
-            className="p-6 flex flex-col gap-6 border border-gray-200 dark:border-[#171c19] bg-white dark:bg-[#171c19] shadow-sm rounded-xl w-full max-w-4xl transition-colors"
+            className="p-5 sm:p-6 flex flex-col gap-6 border border-[var(--border)] bg-[var(--surface)] shadow-[0_10px_30px_var(--shadow)] rounded-[24px] w-full transition-colors"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: "easeOut" }}
@@ -212,17 +212,17 @@ function Dailyprogessgraph() {
             >
                 <motion.div className="flex items-center gap-2" variants={fadeUp}>
                     <motion.span
-                        className="material-symbols-outlined text-gray-700 dark:text-gray-300"
+                        className="material-symbols-outlined text-[var(--accent)]"
                         initial={{ rotate: -15, scale: 0.6 }}
                         animate={{ rotate: 0, scale: 1 }}
                         transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.1 }}
                     >
                         bar_chart
                     </motion.span>
-                    <span className="text-base font-bold text-gray-800 dark:text-white">Daily Progress</span>
+                    <span className="text-base font-bold text-[var(--text)]">Daily Progress</span>
                 </motion.div>
 
-                <motion.p className="text-xs text-gray-500 dark:text-gray-400 pl-8" variants={fadeUp}>
+                <motion.p className="text-xs text-[var(--text-muted)] pl-8" variants={fadeUp}>
                     Track how many habits you complete each day this {month} {fullyear}
                 </motion.p>
             </motion.div>
@@ -261,7 +261,7 @@ function Dailyprogessgraph() {
                 />
                 <StatCard
                     value={bestDay}
-                    label="Best Day"
+                    label="Max / Day"
                     colorClass="bg-purple-50 dark:bg-purple-900/30"
                     textColor="text-purple-700 dark:text-purple-300"
                     delay={0.36}
@@ -278,4 +278,4 @@ function Dailyprogessgraph() {
     );
 }
 
-export default Dailyprogessgraph;
+export default Dailyprogessgraph;

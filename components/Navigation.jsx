@@ -9,8 +9,9 @@ function Navigation() {
     { to: "/settings", label: "Settings" },
   ];
 
-  const currentActivePath = links.some((l) => l.to === location.pathname)
-    ? location.pathname
+  const normalizedPath = location.pathname === "/" ? "/habits" : location.pathname;
+  const currentActivePath = links.some((l) => l.to === normalizedPath)
+    ? normalizedPath
     : "/habits";
 
   return (
